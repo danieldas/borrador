@@ -14,24 +14,32 @@
 El sistema "Talento Digital" actúa como el núcleo central para la gestión del talento. Se aísla de la nómina y pagos (que seguirán en el ERP actual), pero debe comunicarse con proveedores externos para la emisión de correos y catálogos de cursos.
 
 ### Diagrama de Contexto (C4 Nivel 1)
-*(Nota: El siguiente diagrama está en formato Mermaid. Si usas GitHub o un visor Markdown compatible, se renderizará automáticamente como un gráfico).*
 
 ```mermaid
-C4Context
-    title Diagrama de Contexto de Sistema (Nivel 1) - Talento Digital
+flowchart TD
+    %% Estilos C4
+    classDef person fill:#08427b,color:#fff,stroke:#052e56,stroke-width:2px,rx:5px,ry:5px
+    classDef system fill:#1168bd,color:#fff,stroke:#0b4884,stroke-width:2px,rx:5px,ry:5px
+    classDef external fill:#999999,color:#fff,stroke:#6b6b6b,stroke-width:2px,rx:5px,ry:5px
 
-    Person(empleado, "Empleado / Candidato", "Busca ascender, rinde exámenes y toma cursos.")
-    Person(rrhh, "Especialista RRHH", "Gestiona vacantes, revisa casos prácticos y asigna cursos.")
+    %% Personas
+    empleado["👤 Empleado / Candidato\n[Persona]\n\nPostula a vacantes, rinde\nexámenes y ve su plan de carrera."]:::person
+    rrhh["👤 Especialista RRHH\n[Persona]\n\nAdministra el ciclo de vida del\ntalento y genera reportes."]:::person
+    jefe["👤 Jefatura Operativa\n[Persona]\n\nValida perfiles técnicos y\nsolicita ascensos para su equipo."]:::person
 
-    System(talento_digital, "Sistema Talento Digital", "Plataforma central de reclutamiento, planes de carrera y capacitación.")
+    %% Sistema Central
+    talento_digital["💻 Sistema Talento Digital\n[Sistema de Software]\n\nPlataforma central para gestión\nde talento, capacitación y méritos."]:::system
 
-    System_Ext(mail_server, "Servidor de Correo (SMTP)", "Envía notificaciones, invitaciones masivas y resultados de exámenes.")
-    System_Ext(erp_legacy, "ERP / Sistema Contable", "Provee la base de datos maestra de empleados activos (solo lectura).")
-    System_Ext(proveedor_cursos, "API Proveedor E-Learning", "Plataformas como Udemy/Coursera para sincronizar catálogo de cursos externos.")
+    %% Sistemas Externos
+    erp["🗄️ ERP Colquechaca\n[Sistema Externo]\n\nFuente maestra de datos de\nempleados y estructura orgánica."]:::external
+    smtp["✉️ Servidor SMTP\n[Sistema Externo]\n\nEnvía alertas de vacantes y\nnotificaciones de resultados."]:::external
+    auth["🔐 Active Directory / LDAP\n[Sistema Externo]\n\nGestión de identidades y acceso\núnico (SSO) para empleados."]:::external
 
-    Rel(empleado, talento_digital, "Usa para postularse y capacitarse")
-    Rel(rrhh, talento_digital, "Usa para gestionar vacantes y talento")
-    
-    Rel(talento_digital, mail_server, "Envía emails transaccionales usando")
-    Rel(talento_digital, erp_legacy, "Consulta empleados activos desde")
-    Rel(talento_digital, proveedor_cursos, "Obtiene catálogo de cursos de")
+    %% Relaciones
+    empleado -- "Consulta y postula" ---> talento_digital
+    rrhh -- "Gestiona y supervisa" ---> talento_digital
+    jefe -- "Aprueba y valida" ---> talento_digital
+
+    talento_digital -- "Sincroniza datos de" ---> erp
+    talento_digital -- "Notifica vía" ---> smtp
+    talento_digital -- "Autentica usuarios con" ---> auth
